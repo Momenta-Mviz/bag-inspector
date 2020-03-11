@@ -2506,6 +2506,14 @@ buffer-xor@^1.0.3:
   resolved "https://registry.npm.taobao.org/buffer-xor/download/buffer-xor-1.0.3.tgz#26e61ed1422fb70dd42e6e36729ed51d855fe8d9"
   integrity sha1-JuYe0UIvtw3ULm42cp7VHYVf6Nk=
 
+buffer@5.2.1:
+  version "5.2.1"
+  resolved "https://registry.npm.taobao.org/buffer/download/buffer-5.2.1.tgz#dd57fa0f109ac59c602479044dca7b8b3d0b71d6"
+  integrity sha1-3Vf6DxCaxZxgJHkETcp7iz0LcdY=
+  dependencies:
+    base64-js "^1.0.2"
+    ieee754 "^1.1.4"
+
 buffer@^4.3.0:
   version "4.9.2"
   resolved "https://registry.npm.taobao.org/buffer/download/buffer-4.9.2.tgz#230ead344002988644841ab0244af8c44bbe3ef8"
@@ -4872,6 +4880,11 @@ he@^1.2.0:
   resolved "https://registry.npm.taobao.org/he/download/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha1-hK5l+n6vsWX922FWauFLrwVmTw8=
 
+heap@0.2.6:
+  version "0.2.6"
+  resolved "https://registry.npm.taobao.org/heap/download/heap-0.2.6.tgz#087e1f10b046932fc8594dd9e6d378afc9d1e5ac"
+  integrity sha1-CH4fELBGky/IWU3Z5tN4r8nR5aw=
+
 hex-color-regex@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npm.taobao.org/hex-color-regex/download/hex-color-regex-1.1.0.tgz#4c06fccb4602fe2602b3c93df82d7e7dbf1a8a8e"
@@ -5214,6 +5227,11 @@ inquirer@^7.0.0:
     string-width "^4.1.0"
     strip-ansi "^6.0.0"
     through "^2.3.6"
+
+int53@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npm.taobao.org/int53/download/int53-1.0.0.tgz#65eef2b8e25df0d8d137520f31c47da67c97aaa1"
+  integrity sha1-Ze7yuOJd8NjRN1IPMcR9pnyXqqE=
 
 internal-ip@^4.3.0:
   version "4.3.0"
@@ -8949,6 +8967,15 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
   dependencies:
     hash-base "^3.0.0"
     inherits "^2.0.1"
+
+rosbag@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.npm.taobao.org/rosbag/download/rosbag-2.3.1.tgz#14f187876fa12304f19c37af3370986b8dafd4da"
+  integrity sha1-FPGHh2+hIwTxnDevM3CYa42v1No=
+  dependencies:
+    buffer "5.2.1"
+    heap "0.2.6"
+    int53 "1.0.0"
 
 rsvp@^4.8.4:
   version "4.8.5"
