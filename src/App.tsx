@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import lz4 from "lz4js";
 import "./App.css";
 
 import { open, TimeUtil } from "rosbag";
@@ -22,17 +23,28 @@ const App = (props: any) => {
     const topics = new Set<string>();
     const counter = {};
 
-    await bagInstance.readMessages({ noParse: true }, res => {
-      const { topic, chunkOffset, totalChunks } = res;
-      topics.add(topic);
-      if (counter[topic]) {
-        counter[topic] = counter[topic] + 1;
-      } else {
-        counter[topic] = 1;
-      }
+    await bagInstance.readMessages(
+      {
+        noParse: true,
+        decompress: {
+          lz4: (buffer: Buffer, size: number) => {
+            const buff = new Buffer(lz4.decompress(buffer));
+            return buff;
+          }
+        }
+      },
+      res => {
+        const { topic, chunkOffset, totalChunks } = res;
+        topics.add(topic);
+        if (counter[topic]) {
+          counter[topic] = counter[topic] + 1;
+        } else {
+          counter[topic] = 1;
+        }
 
-      setProgress(Math.round(((chunkOffset + 1) / totalChunks) * 100));
-    });
+        setProgress(Math.round(((chunkOffset + 1) / totalChunks) * 100));
+      }
+    );
 
     setTopicCounter(counter);
     setTopicList(Array.from(topics).sort());
@@ -49,10 +61,10 @@ const App = (props: any) => {
           <hr></hr>
           <div>
             Start Time:{" "}
-            {new Date(basicInfo.startTime.sec * 1000).toLocaleString()}
+            {new Date(basicInfo.startTime.sec * 1000).toLocaleString()}, {basicInfo.startTime.sec}-{basicInfo.startTime.nsec}
           </div>
           <div>
-            End Time: {new Date(basicInfo.endTime.sec * 1000).toLocaleString()}
+            End Time: {new Date(basicInfo.endTime.sec * 1000).toLocaleString()}, {basicInfo.endTime.sec}-{basicInfo.endTime.nsec}
           </div>
           <div>Duration: {basicInfo.duration}s</div>
           <hr />
