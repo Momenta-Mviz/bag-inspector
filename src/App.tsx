@@ -5,35 +5,51 @@ import "./App.css";
 import { open, TimeUtil } from "rosbag";
 
 const App = (props: any) => {
-  const [basicInfo, setBasicInfo] = useState<any>(null);
+  const [meta, setmeta] = useState<any>(null);
   const [topicList, setTopicList] = useState<string[]>([]);
   const [topicCounter, setTopicCounter] = useState<any>();
   const [progress, setProgress] = useState<number>(0);
+  const [topicMsgDefinitions, setTopicMsgDefinitions] = useState<
+    Map<string, string>
+  >(new Map());
 
   const process = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    const bagInstance = await open(files[0]);
+    if (files.length === 0) {
+      return;
+    }
+    const bag = await open(files[0]);
 
-    setBasicInfo({
-      startTime: bagInstance.startTime,
-      endTime: bagInstance.endTime,
-      duration: TimeUtil.compare(bagInstance.endTime, bagInstance.startTime)
+    setmeta({
+      startTime: bag.startTime,
+      endTime: bag.endTime,
+      duration: TimeUtil.compare(bag.endTime, bag.startTime),
     });
+
+    const msgTypes = new Map<string, string>();
+
+    Object.entries<{ topic: string; type: string }>(bag.connections).forEach(
+      ([_, v]) => {
+        msgTypes.set(v.topic, v.type);
+      }
+    );
+
+    setTopicMsgDefinitions(msgTypes);
 
     const topics = new Set<string>();
     const counter = {};
 
-    await bagInstance.readMessages(
+    await bag.readMessages(
       {
         noParse: true,
         decompress: {
           lz4: (buffer: Buffer, size: number) => {
             const buff = new Buffer(lz4.decompress(buffer));
             return buff;
-          }
-        }
+          },
+        },
       },
-      res => {
+      (res) => {
         const { topic, chunkOffset, totalChunks } = res;
         topics.add(topic);
         if (counter[topic]) {
@@ -56,26 +72,32 @@ const App = (props: any) => {
         CHOOSE BAG:
         <input type="file" accept=".bag" onChange={process}></input>
       </div>
-      {basicInfo ? (
+      {meta ? (
         <div className="baginfo">
           <hr></hr>
           <div>
-            Start Time:{" "}
-            {new Date(basicInfo.startTime.sec * 1000).toLocaleString()}, {basicInfo.startTime.sec}-{basicInfo.startTime.nsec}
+            Start Time: {new Date(meta.startTime.sec * 1000).toLocaleString()},{" "}
+            {meta.startTime.sec}-{meta.startTime.nsec}
           </div>
           <div>
-            End Time: {new Date(basicInfo.endTime.sec * 1000).toLocaleString()}, {basicInfo.endTime.sec}-{basicInfo.endTime.nsec}
+            End Time: {new Date(meta.endTime.sec * 1000).toLocaleString()},{" "}
+            {meta.endTime.sec}-{meta.endTime.nsec}
           </div>
-          <div>Duration: {basicInfo.duration}s</div>
+          <div>Duration: {meta.duration}s</div>
           <hr />
           {progress < 100 ? (
             <div>Processing: {progress} %</div>
           ) : (
-            topicList.map(t => (
-              <div id={t}>
-                {t} {topicCounter[t]}
-              </div>
-            ))
+            <table>
+              {topicList.map((t) => (
+                <tr id={t}>
+                  <td>{t}</td>
+                  <td>{topicMsgDefinitions.get(t)}</td>{" "}
+                  <td>{topicCounter[t]}</td>
+                  <td>{Math.round(topicCounter[t] / meta.duration)}hz</td>
+                </tr>
+              ))}
+            </table>
           )}
         </div>
       ) : null}
