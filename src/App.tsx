@@ -5,13 +5,13 @@ import "./App.css";
 import { open, TimeUtil } from "rosbag";
 
 const App = (props: any) => {
-  const [meta, setmeta] = useState<any>(null);
+  const [metadata, setMetadata] = useState<any>(null);
   const [topicList, setTopicList] = useState<string[]>([]);
   const [topicCounter, setTopicCounter] = useState<any>();
   const [progress, setProgress] = useState<number>(0);
-  const [topicMsgDefinitions, setTopicMsgDefinitions] = useState<
-    Map<string, string>
-  >(new Map());
+  const [msgDefinitions, setMsgDefinitions] = useState<Map<string, string[]>>(
+    new Map()
+  );
 
   const process = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -20,21 +20,32 @@ const App = (props: any) => {
     }
     const bag = await open(files[0]);
 
-    setmeta({
+    setMetadata({
       startTime: bag.startTime,
       endTime: bag.endTime,
       duration: TimeUtil.compare(bag.endTime, bag.startTime),
     });
 
-    const msgTypes = new Map<string, string>();
+    const msgTypes = new Map<string, string[]>();
 
-    Object.entries<{ topic: string; type: string }>(bag.connections).forEach(
-      ([_, v]) => {
-        msgTypes.set(v.topic, v.type);
-      }
-    );
+    interface Connection {
+      topic: string;
+      type: string;
+      messageDefinition: string;
+      callerid: string;
+      md5sum: string;
+    }
+    Object.entries<Connection>(bag.connections).forEach(([_, v]) => {
+      // console.log(v);
+      msgTypes.set(v.topic, [
+        v.callerid,
+        v.type,
+        v.md5sum,
+        v.messageDefinition,
+      ]);
+    });
 
-    setTopicMsgDefinitions(msgTypes);
+    setMsgDefinitions(msgTypes);
 
     const topics = new Set<string>();
     const counter = {};
@@ -72,31 +83,56 @@ const App = (props: any) => {
         CHOOSE BAG:
         <input type="file" accept=".bag" onChange={process}></input>
       </div>
-      {meta ? (
+      {metadata ? (
         <div className="baginfo">
           <hr></hr>
           <div>
-            Start Time: {new Date(meta.startTime.sec * 1000).toLocaleString()},{" "}
-            {meta.startTime.sec}-{meta.startTime.nsec}
+            {`Start Time: ${new Date(
+              metadata.startTime.sec * 1000
+            ).toLocaleString()} sec: ${metadata.startTime.sec} nsec: ${
+              metadata.startTime.nsec
+            }`}
           </div>
           <div>
-            End Time: {new Date(meta.endTime.sec * 1000).toLocaleString()},{" "}
-            {meta.endTime.sec}-{meta.endTime.nsec}
+            {`End Time: ${new Date(
+              metadata.endTime.sec * 1000
+            ).toLocaleString()} sec: ${metadata.endTime.sec} nesc: ${
+              metadata.endTime.nsec
+            } `}
           </div>
-          <div>Duration: {meta.duration}s</div>
+          <div>Duration: {metadata.duration}s</div>
           <hr />
           {progress < 100 ? (
             <div>Processing: {progress} %</div>
           ) : (
             <table>
-              {topicList.map((t) => (
-                <tr id={t}>
-                  <td>{t}</td>
-                  <td>{topicMsgDefinitions.get(t)}</td>{" "}
-                  <td>{topicCounter[t]}</td>
-                  <td>{Math.round(topicCounter[t] / meta.duration)}hz</td>
+              <thead>
+                <tr>
+                  <th>Topic</th>
+                  <th>Caller ID</th>
+                  <th>Message Definition</th>
+                  <th>Message Definition MD5</th>
+                  <th>Message Count</th>
+                  <th>Message Frequency</th>
                 </tr>
-              ))}
+              </thead>
+
+              <tbody>
+                {topicList.map((t) => (
+                  <tr id={t}>
+                    <td>{t}</td>
+                    <td>{msgDefinitions.get(t)[0]}</td>
+                    <td>
+                      <span title={msgDefinitions.get(t)[3]}>
+                        {msgDefinitions.get(t)[1]}
+                      </span>
+                    </td>
+                    <td>{msgDefinitions.get(t)[2]}</td>
+                    <td>{topicCounter[t]}</td>
+                    <td>{Math.round(topicCounter[t] / metadata.duration)}hz</td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           )}
         </div>

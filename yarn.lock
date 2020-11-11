@@ -8973,10 +8973,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rosbag@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.npm.taobao.org/rosbag/download/rosbag-2.3.1.tgz#14f187876fa12304f19c37af3370986b8dafd4da"
-  integrity sha1-FPGHh2+hIwTxnDevM3CYa42v1No=
+rosbag@^2.6.3:
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/rosbag/-/rosbag-2.6.3.tgz#317a29d9a38903d721dcd6f0393cf2ea2c70185d"
+  integrity sha512-eHegBvsnEwwsC+MBL+rBJt8M0w+9Fw+VB0aK+l3SAjUNSqffR+bP4+rx54L3feqPQHOhidQESVjtkeiEUcj5rA==
   dependencies:
     buffer "5.2.1"
     heap "0.2.6"
