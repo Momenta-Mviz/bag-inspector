@@ -87,23 +87,20 @@ const App = (props: any) => {
         <div className="baginfo">
           <hr></hr>
           <div>
-            {`Start Time: ${new Date(
-              metadata.startTime.sec * 1000
-            ).toLocaleString()} sec: ${metadata.startTime.sec} nsec: ${
-              metadata.startTime.nsec
-            }`}
+            <b>Start Time: </b>
+            <FormatedDateTime datetime={metadata.startTime}></FormatedDateTime>
           </div>
           <div>
-            {`End Time: ${new Date(
-              metadata.endTime.sec * 1000
-            ).toLocaleString()} sec: ${metadata.endTime.sec} nesc: ${
-              metadata.endTime.nsec
-            } `}
+            <b>End Time: </b>
+            <FormatedDateTime datetime={metadata.endTime}></FormatedDateTime>
           </div>
-          <div>Duration: {metadata.duration}s</div>
+          <div>
+            <b>Duration: </b>
+            {metadata.duration}s
+          </div>
           <hr />
           {progress < 100 ? (
-            <div>Processing: {progress} %</div>
+            <div>{progress}%</div>
           ) : (
             <table>
               <thead>
@@ -123,7 +120,7 @@ const App = (props: any) => {
                     <td>{t}</td>
                     <td>{msgDefinitions.get(t)[0]}</td>
                     <td>
-                      <span title={msgDefinitions.get(t)[3]}>
+                      <span className="msgDef" title={msgDefinitions.get(t)[3]}>
                         {msgDefinitions.get(t)[1]}
                       </span>
                     </td>
@@ -140,5 +137,15 @@ const App = (props: any) => {
     </>
   );
 };
+
+const FormatedDateTime: React.FC<{
+  datetime: { sec: number; nsec: number };
+}> = (props) => (
+  <span>
+    {`${new Date(props.datetime.sec * 1000).toLocaleString()} sec: ${
+      props.datetime.sec
+    } nsec: ${props.datetime.nsec}`}
+  </span>
+);
 
 export default App;

@@ -5,3 +5,18 @@
 .baginfo {
   font-family: monospace;
 }
+
+.msgDef {
+  cursor: help;
+}
+
+table td,
+table th {
+  padding: 3px 1em;
+  text-align: left;
+}
+
+table td:first-child,
+table th:first-child {
+  padding-left: 0;
+}
